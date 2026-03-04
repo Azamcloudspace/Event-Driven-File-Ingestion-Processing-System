@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+
+  Environment:
+    Type: String
+    Default: dev
+
+Resources:
+
+  FileBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  FileQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  FileEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+          - aws.s3
+        detail-type:
+          - Object Created
+        detail:
+          bucket:
+            name:
+              - !Ref FileBucket
+      Targets:
+        - Arn: !GetAtt FileQueue.Arn
+          Id: FileQueueTarget
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  FileTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: FileName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: FileName
+          KeyType: HASH
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  FileProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.11
+      Handler: app.lambda_handler
+      CodeUri: src/
+      Timeout: 30
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref FileTable
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref FileBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FileTable
+        - SQSPollerPolicy:
+            QueueName: !GetAtt FileQueue.QueueName
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt FileQueue.Arn
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref FileProcessorFunction
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
