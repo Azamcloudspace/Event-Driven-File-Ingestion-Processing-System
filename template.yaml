@@ -82,8 +82,7 @@ Resources:
           Properties:
             Queue: !GetAtt FileQueue.Arn
       Tags:
-        - Key: Environment
-          Value: !Ref Environment
+        Environment: dev
 
   LambdaErrorAlarm:
     Type: AWS::CloudWatch::Alarm
@@ -102,3 +101,4 @@ Resources:
         - Key: Environment
 
           Value: !Ref Environment
+
