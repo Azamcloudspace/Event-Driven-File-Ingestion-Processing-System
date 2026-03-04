@@ -10,4 +10,4 @@ phases:
   build:
     commands:
       - sam build
-      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+      - sam deploy --stack-name file-processing-stack --region us-east-1 --no-confirm-changeset --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
