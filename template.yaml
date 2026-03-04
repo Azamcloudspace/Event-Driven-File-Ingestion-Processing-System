@@ -8,6 +8,12 @@ Parameters:
     Default: dev
 
 Resources:
+  FileArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
 
   FileBucket:
     Type: AWS::S3::Bucket
@@ -64,7 +70,9 @@ Resources:
     Properties:
       Runtime: python3.11
       Handler: app.lambda_handler
-      CodeUri: lambda/
+      Code: 
+        S3Bucket: !Ref FileArticfactBucket
+        S3Key: lambda/
       Timeout: 30
       Environment:
         Variables:
@@ -101,5 +109,6 @@ Resources:
         - Key: Environment
 
           Value: !Ref Environment
+
 
 
