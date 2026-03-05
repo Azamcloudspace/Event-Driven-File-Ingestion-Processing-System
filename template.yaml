@@ -24,6 +24,20 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
+  
+  FileQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref FileQueue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt FileQueue.Arn
 
   FileEventRule:
     Type: AWS::Events::Rule
@@ -100,6 +114,7 @@ Resources:
         - Key: Environment
 
           Value: !Ref Environment
+
 
 
 
