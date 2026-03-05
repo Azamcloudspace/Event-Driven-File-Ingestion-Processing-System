@@ -97,23 +97,6 @@ Resources:
       Tags:
         Environment: !Ref Environment
 
-  LambdaErrorAlarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      MetricName: Errors
-      Namespace: AWS/Lambda
-      Statistic: Sum
-      Period: 60
-      EvaluationPeriods: 1
-      Threshold: 1
-      ComparisonOperator: GreaterThanOrEqualToThreshold
-      Dimensions:
-        - Name: FunctionName
-          Value: !Ref FileProcessorFunction
-      Tags:
-        - Key: Environment
-
-          Value: !Ref Environment
 
 
 
