@@ -7,6 +7,10 @@ phases:
     commands:
       - pip install aws-sam-cli
 
+  pre_build:
+    commands:
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      
   build:
     commands:
       - aws s3 mb s3://file-azamlambdabucket
