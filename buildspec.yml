@@ -9,6 +9,6 @@ phases:
 
   build:
     commands:
-      - aws s3 mb s3://file-artifactbucket
+      - aws s3 mb s3://file-azamlambdabucket
       - sam build
-      - sam deploy --stack-name file-processing-stack --s3-bucket file-artifactbucket --region eu-central-1 --no-confirm-changeset --role-arn arn:aws:iam::$ACCOUNT_ID:role/cloudformationrole --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
+      - sam deploy --stack-name file-processing-stack --s3-bucket file-azamlambdabucket --region eu-central-1 --no-confirm-changeset --role-arn arn:aws:iam::$ACCOUNT_ID:role/cloudformationrole --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
