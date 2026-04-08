@@ -95,5 +95,4 @@ Resources:
           Properties:
             Queue: !GetAtt FileQueue.Arn
       Tags:
-        - Key: App
-          Value: !Ref Application
+        App: !Ref Application
