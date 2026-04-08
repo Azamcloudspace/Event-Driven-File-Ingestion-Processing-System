@@ -3,8 +3,9 @@ Transform: AWS::Serverless-2016-10-31
 
 Parameters:
 
-  Environment:
+  Application:
     Type: String
+    Default: Event-Driven-File-Ingestion-Processing-System
 
 Resources:
   FileBucket:
@@ -14,15 +15,15 @@ Resources:
         EventBridgeConfiguration:
           EventBridgeEnabled: true
       Tags:
-        - Key: Environment
-          Value: !Ref Environment
+        - Key: App
+          Value: !Ref Application
 
   FileQueue:
     Type: AWS::SQS::Queue
     Properties:
       Tags:
-        - Key: Environment
-          Value: !Ref Environment
+        - Key: App
+          Value: !Ref Application
   
   FileQueuePolicy:
     Type: AWS::SQS::QueuePolicy
@@ -54,8 +55,8 @@ Resources:
         - Arn: !GetAtt FileQueue.Arn
           Id: FileQueueTarget
       Tags:
-        - Key: Environment
-          Value: !Ref Environment
+        - Key: App
+          Value: !Ref Application
 
   FileTable:
     Type: AWS::DynamoDB::Table
@@ -68,8 +69,8 @@ Resources:
         - AttributeName: FileName
           KeyType: HASH
       Tags:
-        - Key: Environment
-          Value: !Ref Environment
+        - Key: App
+          Value: !Ref Application
 
   FileProcessorFunction:
     Type: AWS::Serverless::Function
@@ -94,11 +95,5 @@ Resources:
           Properties:
             Queue: !GetAtt FileQueue.Arn
       Tags:
-        Environment: !Ref Environment
-
-
-
-
-
-
-
+        - Key: App
+          Value: !Ref Application
